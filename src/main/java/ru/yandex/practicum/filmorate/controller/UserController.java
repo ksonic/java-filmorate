@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -42,7 +44,9 @@ public class UserController {
             log.info("Получен запрос PUT /users на обновление пользователя.");
             update(user);
         } else {
-            throw new ValidationException("Пользователя с логином " + user.getLogin() + " не существует.");
+           throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Пользователя с логином " + user.getLogin() + " не существует."
+            );
         }
         return user;
     }
@@ -90,7 +94,7 @@ public class UserController {
     }
 
     private void useLoginAsName(User user) {
-        if (user.getName() == null) {
+        if (user.getName() == null||user.getName().isEmpty()) {
             String login = user.getLogin();
             user.setName(login);
         }
