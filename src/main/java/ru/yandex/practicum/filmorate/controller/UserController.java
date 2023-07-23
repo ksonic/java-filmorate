@@ -44,7 +44,7 @@ public class UserController {
             log.info("Получен запрос PUT /users на обновление пользователя.");
             update(user);
         } else {
-           throw new ResponseStatusException(
+            throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Пользователя с логином " + user.getLogin() + " не существует."
             );
         }
@@ -94,7 +94,7 @@ public class UserController {
     }
 
     private void useLoginAsName(User user) {
-        if (user.getName() == null||user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             String login = user.getLogin();
             user.setName(login);
         }
