@@ -2,18 +2,27 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class FilmController {
+    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Integer, Film> films;
     protected int sequence = 0;
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     public FilmController() {
         this.films = new HashMap<>();
@@ -21,71 +30,45 @@ public class FilmController {
 
     @GetMapping("/films")
     public List<Film> getFilms() {
-        log.info("Получен запрос GET /films.");
+        log.info("GET /films request received.");
         return new LinkedList<>(films.values());
     }
 
     @PostMapping("/films")
-    public Film addFilm(@RequestBody Film film) {
-        try {
-            if (!isAlreadyPublished(film)) {
-                log.info("Получен запрос POST /films на создание фильма.");
-                createFilm(film);
-
-            } else {
-                throw new ValidationException("Фильм с названием " + film.getName() + " уже существует.");
-            }
-        } catch (Exception e) {
-            throw new ValidationException("Произошла ошибка", e);
-        }
+    public Film addFilm(@Valid @RequestBody Film film) {
+        log.info("POST /films request received for film creation.");
+        createFilm(film);
         return film;
     }
 
     @PutMapping("/films")
-    public Film updateFilm(@RequestBody Film film) {
-        try {
-            if (isAlreadyPublished(film)) {
-                log.info("Получен запрос POST /films на обновление фильма.");
-                update(film);
-            } else {
-                throw new ValidationException("Фильма с названием " + film.getName() + " не существует.");
-            }
-        } catch (Exception e) {
-            throw new ValidationException("Произошла ошибка", e);
-        }
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        log.info("POST /films request received for film update.");
+        update(film);
         return film;
     }
 
-
     private Film createFilm(Film film) {
-        if (isDurationValid(film) && isDescriptionValid(film)
-                && isNameValid(film) && isReleaseDateValid(film)) {
-            film.setId(generateId());
-            films.put(film.getId(), film);
-        } else {
-            throw new ValidationException("Произошла ошибка валидации.");
+        if (films.containsKey(film.getId())) {
+            throw new ValidationException("Film  with name " + film.getName() + " is already exists.");
         }
+        if (!isReleaseDateValid(film)) {
+            throw new ValidationException("Validation error happened.");
+        }
+        film.setId(generateId());
+        films.put(film.getId(), film);
         return film;
     }
 
     public void update(Film film) {
+        if (!films.containsKey(film.getId())) {
+            throw new ValidationException("Film with name " + film.getName() + " isn't found.");
+        }
         films.put(film.getId(), film);
     }
 
     private int generateId() {
         return ++sequence;
-    }
-
-    public boolean isAlreadyPublished(Film film) {
-        return films.containsKey(film.getId());
-    }
-
-    public boolean isDescriptionValid(Film film) {
-        return film.getDescription().length() <= 200;
-    }
-
-    public boolean isNameValid(Film film) {
-        return !film.getName().isEmpty();
     }
 
     public boolean isReleaseDateValid(Film film) {
@@ -95,12 +78,7 @@ public class FilmController {
             Date oldestDate = format.parse("1895-12-28");
             return releaseDate.after(oldestDate);
         } catch (Exception exception) {
-            throw new ValidationException("Произошла ошибка: ", exception);
+            throw new ValidationException("Error happened: ", exception);
         }
-
-    }
-
-    public boolean isDurationValid(Film film) {
-        return film.getDuration() > 0;
     }
 }

@@ -3,19 +3,28 @@ package ru.yandex.practicum.filmorate.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final Map<Integer, User> users;
     protected int sequence = 0;
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     public UserController() {
         this.users = new HashMap<>();
@@ -23,63 +32,48 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getFilms() {
-        log.info("Получен запрос GET /films.");
+        log.info("GET /films request received.");
         return new LinkedList<>(users.values());
     }
 
     @PostMapping("/users")
-    public User addUser(@RequestBody User user) {
-        if (!isExists(user)) {
-            log.info("Получен запрос POST /users на создание пользователя.");
-            createUser(user);
-        } else {
-            throw new ValidationException("Пользователь с логином " + user.getLogin() + " уже существует.");
-        }
+    public User addUser(@Valid @RequestBody User user) {
+        log.info("POST /users request received for user creation.");
+        createUser(user);
         return user;
     }
 
     @PutMapping("/users")
-    public User updateUser(@RequestBody User user) {
-        if (isExists(user)) {
-            log.info("Получен запрос PUT /users на обновление пользователя.");
-            update(user);
-        } else {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Пользователя с логином " + user.getLogin() + " не существует."
-            );
-        }
+    public User updateUser(@Valid @RequestBody User user) {
+        log.info("PUT /users request received for user update.");
+        update(user);
         return user;
     }
 
     private User createUser(User user) {
-        if (isEmailValid(user) && isLoginValid(user) && isBirthdayValid(user)) {
-            useLoginAsName(user);
-            user.setId(generateId());
-            users.put(user.getId(), user);
-        } else {
-            throw new ValidationException("Произошла ошибка валидации.");
+        if (users.containsKey(user.getId())) {
+            throw new ValidationException("User with login " + user.getLogin() + " is already exists.");
         }
+        if (!isBirthdayValid(user)) {
+            throw new ValidationException("Validation error happened.");
+        }
+        useLoginAsName(user);
+        user.setId(generateId());
+        users.put(user.getId(), user);
         return user;
     }
 
     private void update(User user) {
+        if (!users.containsKey(user.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "User with login " + user.getLogin() + " isn't exist."
+            );
+        }
         users.put(user.getId(), user);
     }
 
     private int generateId() {
         return ++sequence;
-    }
-
-    private boolean isExists(User user) {
-        return users.containsKey(user.getId());
-    }
-
-    private boolean isEmailValid(User user) {
-        return !user.getEmail().isEmpty() && user.getEmail().contains("@");
-    }
-
-    private boolean isLoginValid(User user) {
-        return !(user.getLogin().isEmpty() && user.getLogin().isBlank());
     }
 
     private boolean isBirthdayValid(User user) {
@@ -89,7 +83,7 @@ public class UserController {
             Date now = new Date();
             return docDate.before(now);
         } catch (Exception exception) {
-            throw new ValidationException("Произошла ошибка: ", exception);
+            throw new ValidationException("Error happened: ", exception);
         }
     }
 
