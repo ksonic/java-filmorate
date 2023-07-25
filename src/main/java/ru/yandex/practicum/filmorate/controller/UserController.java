@@ -23,7 +23,7 @@ import java.util.Map;
 @RestController
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Integer, User> users;
+    private final Map<Long, User> users;
     protected int sequence = 0;
 
     public UserController() {
@@ -72,7 +72,7 @@ public class UserController {
         users.put(user.getId(), user);
     }
 
-    private int generateId() {
+    private long generateId() {
         return ++sequence;
     }
 

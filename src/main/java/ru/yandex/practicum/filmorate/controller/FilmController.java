@@ -21,7 +21,7 @@ import java.util.Map;
 @RestController
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final Map<Integer, Film> films;
+    private final Map<Long, Film> films;
     protected int sequence = 0;
 
     public FilmController() {
@@ -67,7 +67,7 @@ public class FilmController {
         films.put(film.getId(), film);
     }
 
-    private int generateId() {
+    private long generateId() {
         return ++sequence;
     }
 
