@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -19,9 +17,6 @@ public class InMemoryUserStorage implements UserStorage {
     protected int sequence = 0;
 
     public User createUser(User user) {
-        if (users.containsKey(user.getId())) {
-            throw new ValidationException("User with login " + user.getLogin() + " is already exists.");
-        }
         if (!isBirthdayValid(user)) {
             throw new ValidationException("Validation error happened.");
         }
@@ -32,11 +27,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public void update(User user) {
-        if (!users.containsKey(user.getId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "User with login " + user.getLogin() + " isn't exist."
-            );
-        }
         users.put(user.getId(), user);
     }
 
@@ -67,16 +57,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User getUserById(long userId) {
-        if (!users.containsKey(userId)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "User with id " + userId + " isn't exist."
-            );
-        }
         return users.get(userId);
     }
 
     public Map<Long, User> getUsers() {
         return users;
     }
+
 
 }

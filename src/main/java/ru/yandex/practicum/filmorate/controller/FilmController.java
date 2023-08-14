@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -22,38 +21,35 @@ import java.util.List;
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final FilmService filmService;
-    private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmController(FilmService filmService, FilmStorage filmStorage) {
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
-        this.filmStorage = filmStorage;
     }
 
     @GetMapping("/films")
     public List<Film> getFilms() {
         log.info("GET /films request received.");
-        return filmStorage.getFilms();
+        return filmService.getFilms();
     }
 
     @PostMapping("/films")
     public Film addFilm(@Valid @RequestBody Film film) {
         log.info("POST /films request received for film creation.");
-        filmStorage.createFilm(film);
-        return film;
+        return filmService.createFilm(film);
     }
 
     @PutMapping("/films")
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("PUT /films request received for film update.");
-        filmStorage.update(film);
+        filmService.updateFilm(film);
         return film;
     }
 
     @GetMapping("/films/{filmId}")
     public Film getFilmById(@PathVariable long filmId) {
         log.info("GET /films/{filmId} request received.");
-        return filmStorage.getFilmById(filmId);
+        return filmService.getFilmById(filmId);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
@@ -69,11 +65,8 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> getMostLikedFilms(@RequestParam(required = false) Integer count) {
+    public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10", required = false) Integer count) {
         log.info("GET /films/popular?count request received for getting a list of most popular films.");
-        if (count == null) {
-            count = 10;
-        }
         return filmService.getMostLikedFilms(count);
     }
 }

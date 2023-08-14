@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,38 +19,36 @@ import java.util.List;
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
-    private final UserStorage userStorage;
 
 
-    public UserController(UserService userService, UserStorage userStorage) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userStorage = userStorage;
     }
 
     @GetMapping("/users")
-    public List<User> getFilms() {
+    public List<User> getUsers() {
         log.info("GET /films request received.");
-        return userStorage.getFilms();
+        return userService.getUsers();
     }
 
     @PostMapping("/users")
     public User addUser(@Valid @RequestBody User user) {
         log.info("POST /users request received for user creation.");
-        userStorage.createUser(user);
+        userService.addUser(user);
         return user;
     }
 
     @PutMapping("/users")
     public User updateUser(@Valid @RequestBody User user) {
         log.info("PUT /users request received for user update.");
-        userStorage.update(user);
+        userService.updateUser(user);
         return user;
     }
 
     @GetMapping("/users/{userId}")
     public User getUserById(@PathVariable long userId) {
         log.info("GET /users/{userId} request received.");
-        return userStorage.getUserById(userId);
+        return userService.getUserById(userId);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
