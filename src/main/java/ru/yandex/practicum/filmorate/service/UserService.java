@@ -87,11 +87,11 @@ public class UserService {
         return userStorage.createUser(user);
     }
 
-    public void updateUser(User user) {
+    public User updateUser(User user) {
         if (!userStorage.containsUser(user.getId())) {
             throw new NotFoundException("User with id" + user.getId() + " is not found.");
         }
-        userStorage.update(user);
+        return userStorage.update(user);
     }
 
     public List<User> getUsers() {

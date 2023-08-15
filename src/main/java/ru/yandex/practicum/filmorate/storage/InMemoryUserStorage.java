@@ -20,8 +20,9 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    public void update(User user) {
+    public User update(User user) {
         users.put(user.getId(), user);
+        return user;
     }
 
     private long generateId() {

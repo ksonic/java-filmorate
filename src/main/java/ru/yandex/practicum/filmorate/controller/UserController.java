@@ -40,8 +40,7 @@ public class UserController {
     @PutMapping("/users")
     public User updateUser(@Valid @RequestBody User user) {
         log.info("PUT /users request received for user update.");
-        userService.updateUser(user);
-        return user;
+        return userService.updateUser(user);
     }
 
     @GetMapping("/users/{userId}")
