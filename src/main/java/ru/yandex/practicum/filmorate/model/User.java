@@ -22,9 +22,9 @@ public class User {
     private String login;
     private String name;
     private String birthday;
-    private Set<Long> friends = new HashSet<>();
+    private Set<Long> friendsId = new HashSet<>();
 
-    public void addFriend(long friendId) {
-        friends.add(friendId);
+    public void addFriendId(long friendId) {
+        friendsId.add(friendId);
     }
 }

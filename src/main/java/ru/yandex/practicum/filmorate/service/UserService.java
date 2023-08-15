@@ -6,7 +6,9 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -22,85 +24,95 @@ public class UserService {
     }
 
     public void addUserToFriends(long userId, long friendId) {
-        if (!containsUser(userId)) {
+        if (!userStorage.containsUser(userId)) {
             throw new NotFoundException("User with id" + userId + " is not found.");
         }
-        if (!containsUser(friendId)) {
+        if (!userStorage.containsUser(friendId)) {
             throw new NotFoundException("User with id" + friendId + " is not found.");
         }
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
-        user.addFriend(friendId);
-        friend.addFriend(userId);
-        userStorage.getUsers().put(userId, user);
-        userStorage.getUsers().put(friendId, friend);
+        user.addFriendId(friendId);
+        friend.addFriendId(userId);
+        userStorage.getUsers().add(user);
+        userStorage.getUsers().add(friend);
     }
 
     public void deleteUserFromFriends(long userId, long friendId) {
         User user = userStorage.getUserById(userId);
         userStorage.getUserById(userId);
         userStorage.getUserById(friendId);
-        user.getFriends().remove(friendId);
-        userStorage.getUsers().put(user.getId(), user);
+        user.getFriendsId().remove(friendId);
+        userStorage.getUsers().add(user);
     }
 
     public List<User> getUserFriends(long userId) {
-        if (!containsUser(userId)) {
+        if (!userStorage.containsUser(userId)) {
             throw new NotFoundException("User with id" + userId + " is not found.");
         }
-        return userStorage.getUserById(userId).getFriends().stream().map(userStorage::getUserById).collect(Collectors.toList());
+        return userStorage.getUserById(userId).getFriendsId().stream().map(userStorage::getUserById).collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long userId, long otherId) {
-        if (!containsUser(userId)) {
+        if (!userStorage.containsUser(userId)) {
             throw new NotFoundException("User with id" + userId + " is not found.");
         }
-        if (!containsUser(otherId)) {
+        if (!userStorage.containsUser(otherId)) {
             throw new NotFoundException("User with id" + otherId + " is not found.");
         }
-        Set<Long> firstUserFriends = userStorage.getUserById(userId).getFriends();
-        Set<Long> secondUserFriends = userStorage.getUserById(otherId).getFriends();
+        Set<Long> firstUserFriends = userStorage.getUserById(userId).getFriendsId();
+        Set<Long> secondUserFriends = userStorage.getUserById(otherId).getFriendsId();
         List<User> fullParamFriends = new ArrayList<>();
         if (firstUserFriends == null || secondUserFriends == null) {
             return fullParamFriends;
         }
-        List<Long> commonFriendsId = firstUserFriends
+        List<Long> commonFriendIds = firstUserFriends
                 .stream()
                 .filter(secondUserFriends::contains)
                 .distinct()
                 .collect(Collectors.toList());
-        for (Long friend : commonFriendsId) {
+        for (Long friend : commonFriendIds) {
             fullParamFriends.add(userStorage.getUserById(friend));
         }
         return fullParamFriends;
     }
 
-    public List<User> getUsers() {
-        return new LinkedList<>(userStorage.getUsers().values());
-    }
-
-    public void addUser(User user) {
-        if (containsUser(user.getId())) {
+    public User addUser(User user) {
+        if (userStorage.containsUser(user.getId())) {
             throw new ValidationException("User with login " + user.getLogin() + " is already exists.");
         }
-        userStorage.createUser(user);
+        if (!isBirthdayValid(user)) {
+            throw new ValidationException("Validation error happened.");
+        }
+        return userStorage.createUser(user);
     }
 
     public void updateUser(User user) {
-        if (!containsUser(user.getId())) {
+        if (!userStorage.containsUser(user.getId())) {
             throw new NotFoundException("User with id" + user.getId() + " is not found.");
         }
         userStorage.update(user);
     }
 
+    public List<User> getUsers() {
+        return new LinkedList<>(userStorage.getUsers());
+    }
+
     public User getUserById(long userId) {
-        if (!containsUser(userId)) {
+        if (!userStorage.containsUser(userId)) {
             throw new NotFoundException("User with id" + userId + " is not found.");
         }
         return userStorage.getUserById(userId);
     }
 
-    public boolean containsUser(long userId) {
-        return userStorage.getUsers().containsKey(userId);
+    private boolean isBirthdayValid(User user) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date docDate = format.parse(user.getBirthday());
+            Date now = new Date();
+            return docDate.before(now);
+        } catch (Exception exception) {
+            throw new ValidationException("Error happened: ", exception);
+        }
     }
 }

@@ -25,13 +25,13 @@ public class Film {
     @Positive(message = "Duration should be positive")
     private int duration;
 
-    private Set<Long> userLikes = new HashSet<>();
+    private Set<Long> userLikeIds = new HashSet<>();
 
-    public void addUserLike(long userId) {
-        userLikes.add(userId);
+    public void addUserLikeId(long userId) {
+        userLikeIds.add(userId);
     }
 
     public Integer getLikeCount() {
-        return this.userLikes.size();
+        return this.userLikeIds.size();
     }
 }

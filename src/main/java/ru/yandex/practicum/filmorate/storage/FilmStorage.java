@@ -9,7 +9,9 @@ public interface FilmStorage {
 
     Film createFilm(Film film);
 
-    void update(Film film);
+    Film update(Film film);
 
     Film getFilmById(long filmId);
+
+    Boolean containsFilm(long filmId);
 }

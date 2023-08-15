@@ -23,8 +23,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    public void update(Film film) {
+    public Film update(Film film) {
         films.put(film.getId(), film);
+        return film;
     }
 
     private long generateId() {
@@ -33,5 +34,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Film getFilmById(long filmId) {
         return films.get(filmId);
+    }
+
+    public Boolean containsFilm(long filmId) {
+        return getFilms().contains(getFilmById(filmId));
     }
 }

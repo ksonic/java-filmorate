@@ -42,8 +42,7 @@ public class FilmController {
     @PutMapping("/films")
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("PUT /films request received for film update.");
-        filmService.updateFilm(film);
-        return film;
+        return filmService.updateFilm(film);
     }
 
     @GetMapping("/films/{filmId}")
@@ -65,7 +64,7 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10", required = false) Integer count) {
+    public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10") Integer count) {
         log.info("GET /films/popular?count request received for getting a list of most popular films.");
         return filmService.getMostLikedFilms(count);
     }

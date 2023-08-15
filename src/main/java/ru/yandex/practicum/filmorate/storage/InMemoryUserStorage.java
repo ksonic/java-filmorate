@@ -1,11 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,9 +14,6 @@ public class InMemoryUserStorage implements UserStorage {
     protected int sequence = 0;
 
     public User createUser(User user) {
-        if (!isBirthdayValid(user)) {
-            throw new ValidationException("Validation error happened.");
-        }
         useLoginAsName(user);
         user.setId(generateId());
         users.put(user.getId(), user);
@@ -38,16 +32,6 @@ public class InMemoryUserStorage implements UserStorage {
         return new LinkedList<>(users.values());
     }
 
-    private boolean isBirthdayValid(User user) {
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            Date docDate = format.parse(user.getBirthday());
-            Date now = new Date();
-            return docDate.before(now);
-        } catch (Exception exception) {
-            throw new ValidationException("Error happened: ", exception);
-        }
-    }
 
     private void useLoginAsName(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
@@ -56,13 +40,16 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
+    public List<User> getUsers() {
+        return new LinkedList<>(users.values());
+    }
+
     public User getUserById(long userId) {
         return users.get(userId);
     }
 
-    public Map<Long, User> getUsers() {
-        return users;
+    public Boolean containsUser(long userId) {
+        return users.containsKey(userId);
     }
-
 
 }

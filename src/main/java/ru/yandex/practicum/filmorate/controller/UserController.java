@@ -34,8 +34,7 @@ public class UserController {
     @PostMapping("/users")
     public User addUser(@Valid @RequestBody User user) {
         log.info("POST /users request received for user creation.");
-        userService.addUser(user);
-        return user;
+        return userService.addUser(user);
     }
 
     @PutMapping("/users")
