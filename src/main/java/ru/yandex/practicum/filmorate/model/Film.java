@@ -1,11 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
+import java.util.Set;
 
+@Component
 @Data
 public class Film {
     private long id;
@@ -20,4 +24,14 @@ public class Film {
 
     @Positive(message = "Duration should be positive")
     private int duration;
+
+    private Set<Long> userLikeIds = new HashSet<>();
+
+    public void addUserLikeId(long userId) {
+        userLikeIds.add(userId);
+    }
+
+    public Integer getLikeCount() {
+        return this.userLikeIds.size();
+    }
 }
