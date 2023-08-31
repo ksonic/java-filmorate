@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         userStorage.getUserById(userId);
         userStorage.getUserById(friendId);
-        user.getFriendsId().remove(friendId);
+        user.getFriendIds().remove(friendId);
         userStorage.getUsers().add(user);
     }
 
@@ -50,7 +49,7 @@ public class UserService {
         if (!userStorage.containsUser(userId)) {
             throw new NotFoundException("User with id" + userId + " is not found.");
         }
-        return userStorage.getUserById(userId).getFriendsId().stream().map(userStorage::getUserById).collect(Collectors.toList());
+        return userStorage.getUserById(userId).getFriendIds().stream().map(userStorage::getUserById).collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long userId, long otherId) {
@@ -60,8 +59,8 @@ public class UserService {
         if (!userStorage.containsUser(otherId)) {
             throw new NotFoundException("User with id" + otherId + " is not found.");
         }
-        Set<Long> firstUserFriends = userStorage.getUserById(userId).getFriendsId();
-        Set<Long> secondUserFriends = userStorage.getUserById(otherId).getFriendsId();
+        Set<Long> firstUserFriends = userStorage.getUserById(userId).getFriendIds();
+        Set<Long> secondUserFriends = userStorage.getUserById(otherId).getFriendIds();
         List<User> fullParamFriends = new ArrayList<>();
         if (firstUserFriends == null || secondUserFriends == null) {
             return fullParamFriends;
@@ -81,9 +80,10 @@ public class UserService {
         if (userStorage.containsUser(user.getId())) {
             throw new ValidationException("User with login " + user.getLogin() + " is already exists.");
         }
-        if (!isBirthdayValid(user)) {
+        if (!validateBirthday(user)) {
             throw new ValidationException("Validation error happened.");
         }
+        useLoginAsName(user);
         return userStorage.createUser(user);
     }
 
@@ -95,7 +95,7 @@ public class UserService {
     }
 
     public List<User> getUsers() {
-        return new LinkedList<>(userStorage.getUsers());
+        return new ArrayList<>(userStorage.getUsers());
     }
 
     public User getUserById(long userId) {
@@ -105,7 +105,7 @@ public class UserService {
         return userStorage.getUserById(userId);
     }
 
-    private boolean isBirthdayValid(User user) {
+    private boolean validateBirthday(User user) {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             Date docDate = format.parse(user.getBirthday());
@@ -113,6 +113,13 @@ public class UserService {
             return docDate.before(now);
         } catch (Exception exception) {
             throw new ValidationException("Error happened: ", exception);
+        }
+    }
+
+    private void useLoginAsName(User user) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            String login = user.getLogin();
+            user.setName(login);
         }
     }
 }

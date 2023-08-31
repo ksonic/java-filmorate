@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     protected int sequence = 0;
 
     public List<Film> getFilms() {
-        return new LinkedList<>(films.values());
+        return new ArrayList<>(films.values());
     }
 
     public Film createFilm(Film film) {
@@ -37,6 +37,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Boolean containsFilm(long filmId) {
-        return getFilms().contains(getFilmById(filmId));
+        return films.containsKey(filmId);
     }
 }

@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public class InMemoryUserStorage implements UserStorage {
     protected int sequence = 0;
 
     public User createUser(User user) {
-        useLoginAsName(user);
+
         user.setId(generateId());
         users.put(user.getId(), user);
         return user;
@@ -30,19 +30,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public List<User> getFilms() {
-        return new LinkedList<>(users.values());
-    }
-
-
-    private void useLoginAsName(User user) {
-        if (user.getName() == null || user.getName().isEmpty()) {
-            String login = user.getLogin();
-            user.setName(login);
-        }
+        return new ArrayList<>(users.values());
     }
 
     public List<User> getUsers() {
-        return new LinkedList<>(users.values());
+        return new ArrayList<>(users.values());
     }
 
     public User getUserById(long userId) {
@@ -52,5 +44,4 @@ public class InMemoryUserStorage implements UserStorage {
     public Boolean containsUser(long userId) {
         return users.containsKey(userId);
     }
-
 }
