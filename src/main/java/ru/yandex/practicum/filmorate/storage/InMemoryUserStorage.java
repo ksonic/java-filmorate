@@ -14,7 +14,6 @@ public class InMemoryUserStorage implements UserStorage {
     protected int sequence = 0;
 
     public User createUser(User user) {
-
         user.setId(generateId());
         users.put(user.getId(), user);
         return user;
@@ -43,5 +42,14 @@ public class InMemoryUserStorage implements UserStorage {
 
     public Boolean containsUser(long userId) {
         return users.containsKey(userId);
+    }
+
+    public void requestFriendship(long userId, long friendId) {
+    }
+
+    public List<Long> getUserFriends(long userId) {
+        return null;
+    }
+    public void removeUserFromFriends(long userId, long friendId) {
     }
 }

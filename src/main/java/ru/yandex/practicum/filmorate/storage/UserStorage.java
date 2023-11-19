@@ -2,10 +2,11 @@ package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface UserStorage {
-    User createUser(User user);
+    User createUser(User user) throws SQLException;
 
     User update(User user);
 
@@ -17,4 +18,9 @@ public interface UserStorage {
 
     Boolean containsUser(long userId);
 
+    void requestFriendship(long userId, long friendId);
+
+    List<Long> getUserFriends(long userId);
+
+    void removeUserFromFriends(long userId, long friendId);
 }
