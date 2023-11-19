@@ -33,8 +33,6 @@ public class FilmService {
             throw new NotFoundException("Film with id " + filmId + " is not found.");
         }
         filmStorage.likeFilm(filmId, userId);
-        film.addUserLikeId(userId);
-        filmStorage.getFilms().add(film);
     }
 
     public void deleteLikeFromFilm(long filmId, long userId) {
