@@ -50,6 +50,6 @@ public class InMemoryUserStorage implements UserStorage {
     public List<Long> getUserFriends(long userId) {
         return null;
     }
-    public void removeUserFromFriends(long userId, long friendId) {
-    }
+
+    public void removeUserFromFriends(long userId, long friendId) {}
 }
