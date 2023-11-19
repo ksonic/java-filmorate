@@ -33,6 +33,7 @@ public class Film implements Serializable {
 
     private Set<Genre> genres = new HashSet<>();
     private MPA mpa;
+
     public void addUserLikeId(long userId) {
         userLikeIds.add(userId);
     }
