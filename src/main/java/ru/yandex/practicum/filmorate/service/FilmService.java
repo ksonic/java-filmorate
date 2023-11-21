@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -47,9 +46,9 @@ public class FilmService {
         filmStorage.getFilms().add(film);
     }
 
-   public List<Film> getMostLikedFilms(int count) {
-     return   filmStorage.getMostLikedFilms(count);
-   }
+    public List<Film> getMostLikedFilms(int count) {
+        return filmStorage.getMostLikedFilms(count);
+    }
 
     public Film createFilm(Film film) {
         if (filmStorage.containsFilm(film.getId())) {

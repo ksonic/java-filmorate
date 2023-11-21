@@ -30,5 +30,6 @@ public interface FilmStorage {
     boolean containsGenre(long id);
 
     void likeFilm(long filmId, long userId);
+
     List<Film> getMostLikedFilms(int count);
 }

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -22,7 +21,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -248,16 +246,17 @@ public class FilmDbStorage implements FilmStorage {
         }
         return genre;
     }
+
     @Override
     public List<Film> getMostLikedFilms(int count) {
-        List<Film> films=new ArrayList<>();
-        Film film=new Film();
+        List<Film> films = new ArrayList<>();
+        Film film = new Film();
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS f\n" +
                 "LEFT JOIN (SELECT film_id,count(id) AS c FROM likes\n" +
                 "GROUP BY FILM_ID ) l\n" +
                 "ON f.id=l.film_id\n" +
                 "ORDER BY l.c DESC\n" +
-                "LIMIT ?",count);
+                "LIMIT ?", count);
         while (userRows.next()) {
             film.setId(userRows.getLong("id"));
             film.setName(userRows.getString("name"));
