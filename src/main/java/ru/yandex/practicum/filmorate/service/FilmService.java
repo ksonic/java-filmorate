@@ -47,13 +47,9 @@ public class FilmService {
         filmStorage.getFilms().add(film);
     }
 
-    public List<Film> getMostLikedFilms(int count) {
-        return filmStorage.getFilms()
-                .stream()
-                .sorted((film1, film2) -> film2.getUserLikeIds().size() - film1.getUserLikeIds().size())
-                .limit(count)
-                .collect(Collectors.toList());
-    }
+   public List<Film> getMostLikedFilms(int count) {
+     return   filmStorage.getMostLikedFilms(count);
+   }
 
     public Film createFilm(Film film) {
         if (filmStorage.containsFilm(film.getId())) {

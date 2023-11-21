@@ -10,7 +10,6 @@ import javax.validation.constraints.Pattern;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
 @Data
 public class User {
     @Id

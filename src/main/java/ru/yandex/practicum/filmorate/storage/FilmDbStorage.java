@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -21,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -211,7 +213,6 @@ public class FilmDbStorage implements FilmStorage {
         return likeIds;
     }
 
-
     @Override
     public List<Genre> getGenres() {
         return jdbcTemplate.query("select * from genre", new RowMapper<Genre>() {
@@ -247,5 +248,27 @@ public class FilmDbStorage implements FilmStorage {
         }
         return genre;
     }
-
+    @Override
+    public List<Film> getMostLikedFilms(int count) {
+        List<Film> films=new ArrayList<>();
+        Film film=new Film();
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS f\n" +
+                "LEFT JOIN (SELECT film_id,count(id) AS c FROM likes\n" +
+                "GROUP BY FILM_ID ) l\n" +
+                "ON f.id=l.film_id\n" +
+                "ORDER BY l.c DESC\n" +
+                "LIMIT ?",count);
+        while (userRows.next()) {
+            film.setId(userRows.getLong("id"));
+            film.setName(userRows.getString("name"));
+            film.setDescription(userRows.getString("description"));
+            film.setReleaseDate(userRows.getString("release_date"));
+            film.setUserLikeIds(new HashSet<>(getLikesByFilmId(userRows.getLong("id"))));
+            film.setDuration(userRows.getInt("duration"));
+            film.setGenres(new HashSet<>(getGenresByFilmId(userRows.getLong("id"))));
+            film.setMpa(getMpaById(userRows.getLong("mpa")));
+            films.add(film);
+        }
+        return films;
+    }
 }

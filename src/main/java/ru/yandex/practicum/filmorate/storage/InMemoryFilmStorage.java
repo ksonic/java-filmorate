@@ -76,4 +76,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void likeFilm(long filmId, long userId) {
 
     }
+    @Override
+    public List<Film> getMostLikedFilms(int count) {
+        return null;
+    }
 }

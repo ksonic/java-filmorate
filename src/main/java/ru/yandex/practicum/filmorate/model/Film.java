@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
 @Data
 public class Film implements Serializable {
     @Id
