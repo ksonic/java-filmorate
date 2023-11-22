@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public User addUser(@Valid @RequestBody User user) {
+    public User addUser(@Valid @RequestBody User user) throws SQLException {
         log.info("POST /users request received for user creation.");
         return userService.addUser(user);
     }

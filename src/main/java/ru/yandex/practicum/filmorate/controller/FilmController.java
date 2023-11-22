@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -67,5 +69,29 @@ public class FilmController {
     public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10") Integer count) {
         log.info("GET /films/popular?count request received for getting a list of most popular films.");
         return filmService.getMostLikedFilms(count);
+    }
+
+    @GetMapping("/genres")
+    public List<Genre> getGenre() {
+        log.info("GET /genres request received for getting a list of films genres.");
+        return filmService.getGenres();
+    }
+
+    @GetMapping("/genres/{id}")
+    public Genre getGenresById(@PathVariable long id) {
+        log.info("GET /genres/{id} request received for getting a films genre by id.");
+        return filmService.getGenreById(id);
+    }
+
+    @GetMapping("/mpa")
+    public List<MPA> getMpa() {
+        log.info("GET /mpa request received for getting a list of mpa.");
+        return filmService.getMpaList();
+    }
+
+    @GetMapping("/mpa/{id}")
+    public MPA getMpaById(@PathVariable long id) {
+        log.info("GET /mpa/{id} request received for getting a mpa by id.");
+        return filmService.getMpaById(id);
     }
 }

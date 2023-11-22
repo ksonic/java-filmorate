@@ -4,13 +4,14 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -30,8 +31,7 @@ public class FilmService {
         if (!filmStorage.containsFilm(filmId)) {
             throw new NotFoundException("Film with id " + filmId + " is not found.");
         }
-        film.addUserLikeId(userId);
-        filmStorage.getFilms().add(film);
+        filmStorage.likeFilm(filmId, userId);
     }
 
     public void deleteLikeFromFilm(long filmId, long userId) {
@@ -47,11 +47,7 @@ public class FilmService {
     }
 
     public List<Film> getMostLikedFilms(int count) {
-        return filmStorage.getFilms()
-                .stream()
-                .sorted((film1, film2) -> film2.getLikeCount() - film1.getLikeCount())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getMostLikedFilms(count);
     }
 
     public Film createFilm(Film film) {
@@ -61,7 +57,7 @@ public class FilmService {
         if (!validateReleaseDate(film)) {
             throw new ValidationException("Validation error happened.");
         }
-        return  filmStorage.createFilm(film);
+        return filmStorage.createFilm(film);
     }
 
     public Film updateFilm(Film film) {
@@ -91,5 +87,27 @@ public class FilmService {
         } catch (Exception exception) {
             throw new ValidationException("Error happened: ", exception);
         }
+    }
+
+    public List<Genre> getGenres() {
+        return filmStorage.getGenres();
+    }
+
+    public Genre getGenreById(long id) {
+        if (!filmStorage.containsGenre(id)) {
+            throw new NotFoundException("Genre with id " + id + " is not found.");
+        }
+        return filmStorage.getGenreById(id);
+    }
+
+    public List<MPA> getMpaList() {
+        return filmStorage.getMpaList();
+    }
+
+    public MPA getMpaById(long id) {
+        if (!filmStorage.containsMPA(id)) {
+            throw new NotFoundException("Mpa with id " + id + " is not found.");
+        }
+        return filmStorage.getMpaById(id);
     }
 }

@@ -1,17 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
 @Data
-public class Film {
+public class Film implements Serializable {
+    @Id
+    @GeneratedValue
     private long id;
 
     @NotBlank(message = "Name shouldn't be empty")
@@ -21,17 +24,11 @@ public class Film {
     private String description;
 
     private String releaseDate;
-
     @Positive(message = "Duration should be positive")
     private int duration;
 
     private Set<Long> userLikeIds = new HashSet<>();
 
-    public void addUserLikeId(long userId) {
-        userLikeIds.add(userId);
-    }
-
-    public Integer getLikeCount() {
-        return this.userLikeIds.size();
-    }
+    private Set<Genre> genres = new HashSet<>();
+    private MPA mpa;
 }

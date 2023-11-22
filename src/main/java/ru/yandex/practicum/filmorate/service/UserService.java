@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserStorage userStorage;
 
+
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
@@ -29,25 +31,21 @@ public class UserService {
         if (!userStorage.containsUser(friendId)) {
             throw new NotFoundException("User with id" + friendId + " is not found.");
         }
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        user.addFriendId(friendId);
-        friend.addFriendId(userId);
-        userStorage.getUsers().add(user);
-        userStorage.getUsers().add(friend);
+        userStorage.requestFriendship(userId, friendId);
     }
 
     public void deleteUserFromFriends(long userId, long friendId) {
         User user = userStorage.getUserById(userId);
-        userStorage.getUserById(userId);
-        userStorage.getUserById(friendId);
         user.getFriendIds().remove(friendId);
-        userStorage.getUsers().add(user);
+        userStorage.removeUserFromFriends(userId, friendId);
     }
 
     public List<User> getUserFriends(long userId) {
         if (!userStorage.containsUser(userId)) {
             throw new NotFoundException("User with id" + userId + " is not found.");
+        }
+        if (userStorage.getUserFriends(userId).isEmpty()) {
+            return new ArrayList<>();
         }
         return userStorage.getUserById(userId).getFriendIds().stream().map(userStorage::getUserById).collect(Collectors.toList());
     }
@@ -76,7 +74,7 @@ public class UserService {
         return fullParamFriends;
     }
 
-    public User addUser(User user) {
+    public User addUser(User user) throws SQLException {
         if (userStorage.containsUser(user.getId())) {
             throw new ValidationException("User with login " + user.getLogin() + " is already exists.");
         }
